@@ -22,26 +22,29 @@ public class UserController : Controller
     }
 
     //TODO: Swagger doc
-    //TODO: Fluent Validation for email and user name
     [HttpPost]
-    public async Task<IActionResult> CreateAsync([FromBody] UserRequest request)
+    public async Task<IActionResult> CreateAsync([FromBody] CreateUserRequest request)
     {
         var user = _mapper.Map<User>(request);
 
         var result = await _service.CreateAsync(user);
+
+        if (result is null)
+            return BadRequest();
+
         var userResponse = _mapper.Map<UserResponse>(result);
 
         return Created(nameof(CreateAsync), userResponse);
     }
 
     //TODO: Swagger doc
-    //TODO: Fluent Validation for email
     [HttpPatch("update-email/{id}")]
     public async Task<IActionResult> UpdateEmailAsync([FromRoute] Guid id, [FromBody] UpdateEmailRequest request)
     {
-        await _service.UpdateEmailAsync(id, request.Email);
+        if (await _service.UpdateEmailAsync(id, request.Email))
+            return NoContent();
 
-        return NoContent();
+        return BadRequest();
     }
 
     //TODO: Swagger doc
@@ -50,11 +53,10 @@ public class UserController : Controller
     {
         var result = _service.Get(id);
 
-        if (result != null)
-        {
-            var userResponse = _mapper.Map<UserResponse>(result);
-            return Ok(userResponse);
-        }
-        return NotFound();
+        if (result is null)
+            return NotFound();
+
+        var userResponse = _mapper.Map<UserResponse>(result);
+        return Ok(userResponse);
     }
 }
