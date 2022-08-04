@@ -3,6 +3,7 @@ using Domain;
 using Domain.Events;
 using MassTransit;
 using Repository;
+using Serilog;
 
 namespace Application.Services;
 
@@ -19,11 +20,17 @@ public class UserService : IUserService
 
     public async Task<User> CreateAsync(User user)
     {
-        // TODO: Add log 
+        Log.Information("Service: {service} Method: {method} Request: {@request}",
+            nameof(UserService), nameof(CreateAsync), @user);
+
+        if (_repo.HasUserByEmail(user.Email) || _repo.HasUserByUsername(user.Username))
+            return null;
+
+        user.Id = Guid.NewGuid();
+        user.CreatedAt = DateTime.UtcNow;
+
         try
         {
-            user.Id = Guid.NewGuid();
-            user.CreatedAt = DateTime.UtcNow;
             await _repo.CreateUserAsync(user);
 
             await _publisher.Publish<UserCreatedEvent>(new
@@ -35,25 +42,48 @@ public class UserService : IUserService
                 user.Email
 
             });
+
             return user;
         }
         catch (Exception e)
         {
-            // TODO: Add log 
+            Log.Error(e, "An exception occurred");
             throw;
         }
     }
 
-    public Task UpdateEmailAsync(Guid id, string email)
+    public async Task<bool> UpdateEmailAsync(Guid id, string email)
     {
-        // TODO: Add log 
-        // TODO: implement
-        throw new NotImplementedException();
+        Log.Information("Service: {service} Method: {method} Request: {@request}",
+            nameof(UserService), nameof(UpdateEmailAsync), new { id, email });
+
+        if (_repo.Get(id) is null || _repo.HasUserByEmail(email))
+            return false;
+
+        try
+        {
+            await _repo.UpdateEmailAsync(id, email);
+
+            await _publisher.Publish<UserEmailUpdatedEvent>(new
+            {
+                id,
+                email
+            });
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "An exception occurred");
+            throw;
+        }
+
+        return true;
     }
 
     public User Get(Guid id)
     {
-        // TODO: Add log 
+        Log.Information("Service: {service} Method: {method} Request: {@request}",
+            nameof(UserService), nameof(Get), new { id });
+
         return _repo.Get(id);
     }
 }
