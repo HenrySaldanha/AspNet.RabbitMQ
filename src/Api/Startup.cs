@@ -10,9 +10,10 @@ using Api.Mappings;
 using Serilog;
 using FluentValidation.AspNetCore;
 using System.Reflection;
+using Serilog.Events;
 
 namespace Api;
-public class Startup
+public class Startup : IStartup
 {
     public Startup(IConfiguration configuration)
     {
@@ -66,7 +67,7 @@ public class Startup
         }).AddMassTransitHostedService();
     }
 
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    public void Configure(WebApplication app, IWebHostEnvironment env)
     {
         app.UseHttpsRedirection();
 
@@ -86,4 +87,33 @@ public class Startup
         app.ApplyDatabaseMigrations();
         app.UseSerilogRequestLogging();
     }
+}
+
+public static class StartupExtensions
+{
+    public static WebApplicationBuilder UseStartup<TStartup>(this WebApplicationBuilder webApplication) where TStartup : IStartup
+    {
+        webApplication.Host.UseSerilog(Log.Logger);
+
+        var startup = Activator.CreateInstance(typeof(TStartup), webApplication.Configuration) as IStartup;
+        if (startup is null)
+            throw new ArgumentException("Invalid Startup Class");
+
+        startup.ConfigureServices(webApplication.Services);
+
+        var app = webApplication.Build();
+        startup.Configure(app, app.Environment);
+        app.Run();
+
+        Log.Information("Starting web host");
+
+        return webApplication;
+    }
+}
+
+public interface IStartup
+{
+    IConfiguration Configuration { get; }
+    void ConfigureServices(IServiceCollection services);
+    void Configure(WebApplication app, IWebHostEnvironment env);
 }

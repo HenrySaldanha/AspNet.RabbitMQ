@@ -6,20 +6,23 @@ using Repository;
 using Serilog;
 
 namespace Application.Services;
+
 public class UserService : IUserService
 {
+    private readonly ILogger _logger;
     private readonly IUserRepository _repo;
     private readonly IPublishEndpoint _publisher;
 
-    public UserService(IUserRepository repo, IPublishEndpoint publisher)
+    public UserService(IUserRepository repo, IPublishEndpoint publisher, ILogger logger)
     {
         _repo = repo;
         _publisher = publisher;
+        _logger = logger;
     }
 
     public async Task<User> CreateAsync(User user)
     {
-        Log.Information("Service: {service} Method: {method} Request: {@request}",
+        _logger.Information("Service: {service} Method: {method} Request: {@request}",
             nameof(UserService), nameof(CreateAsync), @user);
 
         if (_repo.HasUserByEmail(user.Email) || _repo.HasUserByUsername(user.Username))
@@ -45,14 +48,14 @@ public class UserService : IUserService
         }
         catch (Exception e)
         {
-            Log.Error(e, "An exception occurred");
+            _logger.Error(e, "An exception occurred");
             throw;
         }
     }
 
     public async Task<bool> UpdateEmailAsync(Guid id, string email)
     {
-        Log.Information("Service: {service} Method: {method} Request: {@request}",
+        _logger.Information("Service: {service} Method: {method} Request: {@request}",
             nameof(UserService), nameof(UpdateEmailAsync), new { id, email });
 
         if (_repo.Get(id) is null || _repo.HasUserByEmail(email))
@@ -70,7 +73,7 @@ public class UserService : IUserService
         }
         catch (Exception e)
         {
-            Log.Error(e, "An exception occurred");
+            _logger.Error(e, "An exception occurred");
             throw;
         }
 
@@ -79,7 +82,7 @@ public class UserService : IUserService
 
     public User Get(Guid id)
     {
-        Log.Information("Service: {service} Method: {method} Request: {@request}",
+        _logger.Information("Service: {service} Method: {method} Request: {@request}",
             nameof(UserService), nameof(Get), new { id });
 
         return _repo.Get(id);
