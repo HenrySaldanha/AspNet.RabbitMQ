@@ -21,7 +21,13 @@ public class UserController : Controller
         _mapper = mapper;
     }
 
-    //TODO: Swagger doc
+
+    /// <summary>
+    /// Create a new user (Email and phone must be valid)
+    /// </summary>
+    /// <param name="request"> User attributes </param>
+    [ProducesResponseType(typeof(UserResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [HttpPost]
     public async Task<IActionResult> CreateAsync([FromBody] CreateUserRequest request)
     {
@@ -37,7 +43,13 @@ public class UserController : Controller
         return Created(nameof(CreateAsync), userResponse);
     }
 
-    //TODO: Swagger doc
+    /// <summary>
+    /// Update user email (Email must be valid and unique)
+    /// </summary>
+    /// <param name="request"> Email value </param>
+    /// <param name="id"> User Id </param>
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [HttpPatch("update-email/{id}")]
     public async Task<IActionResult> UpdateEmailAsync([FromRoute] Guid id, [FromBody] UpdateEmailRequest request)
     {
@@ -47,7 +59,10 @@ public class UserController : Controller
         return BadRequest();
     }
 
-    //TODO: Swagger doc
+    /// <summary>
+    /// Get user by id
+    /// </summary>
+    /// <param name="id"> User Id </param>
     [HttpGet("{id}")]
     public IActionResult Get([FromRoute] Guid id)
     {

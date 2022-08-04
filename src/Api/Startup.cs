@@ -9,6 +9,7 @@ using Application.IServices;
 using Api.Mappings;
 using Serilog;
 using FluentValidation.AspNetCore;
+using System.Reflection;
 
 namespace Api;
 public class Startup
@@ -50,6 +51,10 @@ public class Startup
                     Name = "Henry Saldanha"
                 }
             });
+
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            c.IncludeXmlComments(xmlPath);
         });
 
         services.AddMassTransit(bus =>
