@@ -2,7 +2,6 @@
 using FluentValidation;
 
 namespace Api.Validators;
-
 public class UpdateEmailValidator : AbstractValidator<UpdateEmailRequest>
 {
     public UpdateEmailValidator()

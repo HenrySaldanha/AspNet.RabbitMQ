@@ -2,7 +2,6 @@
 using FluentValidation;
 
 namespace Api.Validators;
-
 public class CreateUserValidator : AbstractValidator<CreateUserRequest>
 {
     public CreateUserValidator()

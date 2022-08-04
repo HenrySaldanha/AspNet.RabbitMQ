@@ -21,7 +21,6 @@ public class UserController : Controller
         _mapper = mapper;
     }
 
-
     /// <summary>
     /// Create a new user (Email and phone must be valid)
     /// </summary>

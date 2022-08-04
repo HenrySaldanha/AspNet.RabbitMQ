@@ -6,7 +6,6 @@ using Repository;
 using Serilog;
 
 namespace Application.Services;
-
 public class UserService : IUserService
 {
     private readonly IUserRepository _repo;
@@ -40,7 +39,6 @@ public class UserService : IUserService
                 user.PhoneNumber,
                 user.CreatedAt,
                 user.Email
-
             });
 
             return user;

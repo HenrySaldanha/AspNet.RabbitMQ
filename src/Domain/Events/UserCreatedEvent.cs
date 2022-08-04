@@ -1,5 +1,4 @@
 ﻿namespace Domain.Events;
-
 public interface UserCreatedEvent
 {
     public Guid Id { get; set; }

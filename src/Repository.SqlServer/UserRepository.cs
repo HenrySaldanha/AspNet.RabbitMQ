@@ -1,7 +1,6 @@
 ﻿using Domain;
 
 namespace Repository.SqlServer;
-
 public class UserRepository : IUserRepository
 {
     private readonly UserContext _context;

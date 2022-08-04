@@ -1,6 +1,6 @@
 ﻿using Domain;
-namespace Application.IServices;
 
+namespace Application.IServices;
 public interface IUserService
 {
     public Task<User> CreateAsync(User request);
