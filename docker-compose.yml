@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server
+    environment:
+        SA_PASSWORD: "1q2w3e4r@abc"
+        ACCEPT_EULA: "Y"
+    ports:
+      - 1433:1433
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  rabbitmq:
+    image: masstransit/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
